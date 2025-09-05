@@ -54,6 +54,12 @@ html {
     margin-right: 10px;
 }
 
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
 .back-to-site {
     padding: 8px 15px;
     background-color: var(--bg-color-lighter);
@@ -83,12 +89,6 @@ html {
     color: var(--text-color);
     cursor: pointer;
     padding: 10px;
-}
-
-@media screen and (max-width: 768px) {
-    .sidebar-toggle {
-        display: block;
-    }
 }
 
 /* Main Content */
@@ -198,14 +198,19 @@ html {
 /* Admin Content */
 .admin-content {
     padding: 30px;
-    overflow-y: auto;
-    background-color: var(--bg-color);
     margin-left: 250px;
+    background-color: var(--bg-color);
+    min-height: calc(100vh - 130px);
 }
 
 .admin-panel {
+    display: none;
     padding-top: 130px;
     scroll-margin-top: 130px;
+}
+
+.admin-panel.active {
+    display: block;
 }
 
 /* Dashboard Controls */
@@ -511,6 +516,10 @@ canvas {
         margin-left: 0;
     }
     
+    .sidebar-toggle {
+        display: block;
+    }
+    
     .stats-details {
         grid-template-columns: 1fr;
     }
@@ -545,6 +554,11 @@ canvas {
     
     .chart-box, .stat-chart-container {
         padding: 15px;
+    }
+    
+    .admin-panel {
+        padding-top: 100px;
+        scroll-margin-top: 100px;
     }
     
     canvas {
