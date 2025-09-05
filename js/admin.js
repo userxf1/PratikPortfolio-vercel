@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const adminPanels = document.querySelectorAll('.admin-panel');
     
     // API endpoint
-    const API_BASE_URL = 'http://' + window.location.hostname + ':3000/api';
+    const API_BASE_URL = '/api';
     
     // Initialize dashboard
     updateStats();
