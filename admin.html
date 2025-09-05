@@ -25,7 +25,7 @@
     <div class="admin-container">
         <header class="admin-header">
             <div class="admin-logo">
-                <a href="index.html">
+                <a href="/">
                     <img src="assets/images/logo.png" alt="Logo" width="30" height="30">
                     <span>Portfolio Admin</span>
                 </a>
@@ -34,7 +34,7 @@
                 <button class="sidebar-toggle" aria-label="Toggle Sidebar">
                     <i class="fas fa-bars"></i>
                 </button>
-                <a href="index.html" class="back-to-site">
+                <a href="/" class="back-to-site">
                     <i class="fas fa-arrow-left"></i> Back to Site
                 </a>
             </div>
@@ -65,6 +65,7 @@
                 <section id="dashboard" class="admin-panel active">
                     <h2 class="panel-title">Dashboard</h2>
                     <div class="dashboard-controls">
+                        <button class="cleanup-btn" onclick="cleanupOldData()">Cleanup Old Data</button>
                     </div>
                     <div class="stats-cards">
                         <div class="stats-card">
