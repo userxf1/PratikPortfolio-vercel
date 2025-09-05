@@ -200,7 +200,7 @@ html {
     padding: 30px;
     margin-left: 250px;
     background-color: var(--bg-color);
-    min-height: calc(100vh - 130px);
+    min-height: calc(150vh - 130px);
 }
 
 .admin-panel {
@@ -241,6 +241,7 @@ html {
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 25px;
     margin-bottom: 40px;
+    width: 700px;
 }
 
 .stats-card {
