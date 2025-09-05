@@ -16,7 +16,6 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
-
 // Initialize PostgreSQL connection
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
@@ -24,6 +23,13 @@ const pool = new Pool({
         rejectUnauthorized: false
     }
 });
+
+// In server.js, add after other middleware:
+const rateLimit = require('express-rate-limit');
+app.use('/api/', rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100 // Limit each IP to 100 requests per windowMs
+}));
 
 // Create visitors table if it doesn't exist
 async function initializeDatabase() {
