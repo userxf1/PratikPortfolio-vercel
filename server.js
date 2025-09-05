@@ -149,25 +149,147 @@ app.post('/api/sessions', async (req, res) => {
     }
 });
 
-// Get all visitor data for admin dashboard
-app.get('/api/admin/data', async (req, res) => {
+// In server.js, replace the /api/admin/data endpoint with these:
+
+// Get total visitor count
+app.get('/api/admin/total-visitors', async (req, res) => {
     try {
-        // Get all visitors
-        const visitorsResult = await pool.query('SELECT * FROM visitors ORDER BY timestamp DESC');
-        
-        // Get all page views
-        const pageViewsResult = await pool.query('SELECT * FROM page_views ORDER BY timestamp DESC');
-        
-        // Get all session durations
-        const sessionsResult = await pool.query('SELECT * FROM session_durations ORDER BY timestamp DESC');
-        
-        res.json({
-            visitors: visitorsResult.rows,
-            pageViews: pageViewsResult.rows,
-            sessionDurations: sessionsResult.rows.map(row => row.duration)
-        });
+        const result = await pool.query('SELECT COUNT(*) AS count FROM visitors');
+        res.json({ count: parseInt(result.rows[0].count) });
     } catch (error) {
-        console.error('Error fetching admin data:', error);
+        console.error('Error fetching total visitors:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// Get total page views
+app.get('/api/admin/total-page-views', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT COUNT(*) AS count FROM page_views');
+        res.json({ count: parseInt(result.rows[0].count) });
+    } catch (error) {
+        console.error('Error fetching total page views:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// Get average session duration
+app.get('/api/admin/avg-session-duration', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT AVG(duration) AS avg_duration FROM session_durations');
+        res.json({ avg_duration: parseFloat(result.rows[0].avg_duration) || 0 });
+    } catch (error) {
+        console.error('Error fetching average session duration:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// Get mobile users percentage
+app.get('/api/admin/mobile-users', async (req, res) => {
+    try {
+        const totalResult = await pool.query('SELECT COUNT(*) AS total FROM visitors');
+        const mobileResult = await pool.query("SELECT COUNT(*) AS mobile_count FROM visitors WHERE device = 'Mobile'");
+        const total = parseInt(totalResult.rows[0].total);
+        const mobileCount = parseInt(mobileResult.rows[0].mobile_count);
+        const percentage = total > 0 ? Math.round((mobileCount / total) * 100) : 0;
+        res.json({ percentage });
+    } catch (error) {
+        console.error('Error fetching mobile users:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// Get recent visitors (for table)
+app.get('/api/admin/recent-visitors', async (req, res) => {
+    try {
+        const result = await pool.query(`
+            SELECT id, timestamp, visits, browser, device, screen_size
+            FROM visitors
+            ORDER BY timestamp DESC
+            LIMIT 50
+        `);
+        res.json(result.rows);
+    } catch (error) {
+        console.error('Error fetching recent visitors:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// Get browser statistics
+app.get('/api/admin/browser-stats', async (req, res) => {
+    try {
+        const result = await pool.query(`
+            SELECT browser, COUNT(*) AS count
+            FROM visitors
+            GROUP BY browser
+            ORDER BY count DESC
+        `);
+        res.json(result.rows);
+    } catch (error) {
+        console.error('Error fetching browser stats:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// Get page view statistics
+app.get('/api/admin/page-stats', async (req, res) => {
+    try {
+        const result = await pool.query(`
+            SELECT page, COUNT(*) AS count
+            FROM page_views
+            GROUP BY page
+            ORDER BY count DESC
+        `);
+        res.json(result.rows);
+    } catch (error) {
+        console.error('Error fetching page stats:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// Get device distribution (for chart)
+app.get('/api/admin/device-stats', async (req, res) => {
+    try {
+        const result = await pool.query(`
+            SELECT device, COUNT(*) AS count
+            FROM visitors
+            GROUP BY device
+            ORDER BY count DESC
+        `);
+        res.json(result.rows);
+    } catch (error) {
+        console.error('Error fetching device stats:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// Get session duration buckets (for chart)
+app.get('/api/admin/session-buckets', async (req, res) => {
+    try {
+        const result = await pool.query(`
+            SELECT
+                CASE
+                    WHEN duration < 60 THEN '< 1 min'
+                    WHEN duration < 180 THEN '1-3 min'
+                    WHEN duration < 300 THEN '3-5 min'
+                    WHEN duration < 600 THEN '5-10 min'
+                    ELSE '> 10 min'
+                END AS bucket,
+                COUNT(*) AS count
+            FROM session_durations
+            GROUP BY bucket
+            ORDER BY
+                CASE bucket
+                    WHEN '< 1 min' THEN 1
+                    WHEN '1-3 min' THEN 2
+                    WHEN '3-5 min' THEN 3
+                    WHEN '5-10 min' THEN 4
+                    ELSE 5
+                END
+        `);
+        res.json(result.rows);
+    } catch (error) {
+        console.error('Error fetching session buckets:', error);
         res.status(500).json({ error: 'Server error' });
     }
 });
