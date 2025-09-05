@@ -4,85 +4,96 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
+    <meta name="description" content="Admin dashboard for visitor tracking and analytics">
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Admin CSS -->
     <link rel="stylesheet" href="css/admin.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <!-- Chart.js for data visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+    <!-- Custom Cursor -->
+    <div class="cursor-outer"></div>
+    <div class="cursor-inner"></div>
+
+    <!-- Admin Dashboard Container -->
     <div class="admin-container">
-        <!-- Header -->
         <header class="admin-header">
             <div class="admin-logo">
-                <a href="/index.html">
-                    <i class="fas fa-shield-alt"></i> Admin Dashboard
+                <a href="index.html">
+                    <img src="assets/images/logo.png" alt="Logo" width="30" height="30">
+                    <span>Portfolio Admin</span>
                 </a>
             </div>
-            <a href="/index.html" class="back-to-site">
-                <i class="fas fa-arrow-left"></i> Back to Site
+            <a href="index.html" class="back-to-site">
+                <i class="fas fa-arrow-left"></i>
+                Back to Site
             </a>
         </header>
 
-        <!-- Main Content -->
-        <div class="admin-main">
-            <!-- Sidebar -->
-            <aside class="admin-sidebar">
+        <main class="admin-main">
+            <div class="admin-sidebar">
                 <div class="admin-profile">
-                    <div class="admin-avatar">A</div>
+                    <div class="admin-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
                     <div class="admin-info">
                         <h3>Admin</h3>
-                        <p>Portfolio Manager</p>
+                        <p>Dashboard</p>
                     </div>
                 </div>
                 <nav class="admin-nav">
                     <ul>
-                        <li class="active"><a href="#dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                        <li class="active"><a href="#dashboard"><i class="fas fa-chart-line"></i> Dashboard</a></li>
                         <li><a href="#visitors"><i class="fas fa-users"></i> Visitors</a></li>
-                        <li><a href="#stats"><i class="fas fa-chart-bar"></i> Stats</a></li>
+                        <li><a href="#stats"><i class="fas fa-chart-bar"></i> Statistics</a></li>
                     </ul>
                 </nav>
-            </aside>
+            </div>
 
-            <!-- Content -->
-            <main class="admin-content">
+            <div class="admin-content">
                 <!-- Dashboard Panel -->
                 <section id="dashboard" class="admin-panel active">
                     <h2 class="panel-title">Dashboard</h2>
-                    <div class="dashboard-controls">
-                        <button class="cleanup-btn" onclick="cleanupOldData()">Cleanup Old Data</button>
-                    </div>
-                    <div class="stats-cards">
-                        <div class="stats-card">
-                            <div class="stats-icon"><i class="fas fa-users"></i></div>
-                            <div class="stats-info">
-                                <h3>Total Visitors</h3>
-                                <p id="total-visitors"><i class="fas fa-spinner fa-spin"></i></p>
-                            </div>
-                        </div>
-                        <div class="stats-card">
-                            <div class="stats-icon"><i class="fas fa-eye"></i></div>
-                            <div class="stats-info">
-                                <h3>Total Page Views</h3>
-                                <p id="total-page-views"><i class="fas fa-spinner fa-spin"></i></p>
-                            </div>
-                        </div>
-                        <div class="stats-card">
-                            <div class="stats-icon"><i class="fas fa-mobile-alt"></i></div>
-                            <div class="stats-info">
-                                <h3>Mobile Users</h3>
-                                <p id="mobile-users"><i class="fas fa-spinner fa-spin"></i></p>
-                            </div>
-                        </div>
-                        <div class="stats-card">
-                            <div class="stats-icon"><i class="fas fa-desktop"></i></div>
-                            <div class="stats-info">
-                                <h3>PC Users</h3>
-                                <p id="pc-users"><i class="fas fa-spinner fa-spin"></i></p>
-                            </div>
-                        </div>
-                    </div>
+                    <!-- In admin.html, inside <section id="dashboard" class="admin-panel active"> -->
+<div class="stats-cards">
+    <div class="stats-card">
+        <div class="stats-icon"><i class="fas fa-users"></i></div>
+        <div class="stats-info">
+            <h3>Total Visitors</h3>
+            <p id="total-visitors"><i class="fas fa-spinner fa-spin"></i></p>
+        </div>
+    </div>
+    <div class="stats-card">
+        <div class="stats-icon"><i class="fas fa-eye"></i></div>
+        <div class="stats-info">
+            <h3>Total Page Views</h3>
+            <p id="total-page-views"><i class="fas fa-spinner fa-spin"></i></p>
+        </div>
+    </div>
+    <div class="stats-card">
+        <div class="stats-icon"><i class="fas fa-mobile-alt"></i></div>
+        <div class="stats-info">
+            <h3>Mobile Users</h3>
+            <p id="mobile-users"><i class="fas fa-spinner fa-spin"></i></p>
+        </div>
+    </div>
+    <div class="stats-card">
+        <div class="stats-icon"><i class="fas fa-desktop"></i></div>
+        <div class="stats-info">
+            <h3>PC Users</h3>
+            <p id="pc-users"><i class="fas fa-spinner fa-spin"></i></p>
+        </div>
+    </div>
+</div>
                     <div class="charts-container">
                         <div class="chart-box">
-                            <h3>Device Distribution</h3>
+                            <h3>Devices</h3>
                             <canvas id="device-chart"></canvas>
                         </div>
                     </div>
@@ -90,29 +101,31 @@
 
                 <!-- Visitors Panel -->
                 <section id="visitors" class="admin-panel">
-                    <h2 class="panel-title">Recent Visitors</h2>
+                    <h2 class="panel-title">Visitors</h2>
                     <div class="table-container">
                         <table class="visitors-table">
                             <thead>
                                 <tr>
-                                    <th>Visitor ID</th>
-                                    <th>Date</th>
+                                    <th>ID</th>
+                                    <th>Date / Time</th>
                                     <th>Visits</th>
                                     <th>Browser</th>
                                     <th>Device</th>
                                     <th>Screen Size</th>
                                 </tr>
                             </thead>
-                            <tbody id="visitors-table-body"></tbody>
+                            <tbody id="visitors-table-body">
+                                <!-- Visitors data will be dynamically inserted here -->
+                            </tbody>
                         </table>
                     </div>
                 </section>
 
-                <!-- Stats Panel -->
+                <!-- Statistics Panel -->
                 <section id="stats" class="admin-panel">
-                    <h2 class="panel-title">Detailed Stats</h2>
+                    <h2 class="panel-title">Statistics</h2>
                     <div class="stats-overview">
-                        <h3>Session Duration</h3>
+                        <h3>Session Duration Distribution</h3>
                         <div class="stat-chart-container">
                             <canvas id="session-chart"></canvas>
                         </div>
@@ -120,23 +133,28 @@
                     <div class="stats-details">
                         <div class="detail-card">
                             <h3>Browser Distribution</h3>
-                            <div class="browser-stats" id="browser-stats"></div>
+                            <div class="browser-stats" id="browser-stats">
+                                <!-- Browser stats will be inserted here -->
+                            </div>
                         </div>
                         <div class="detail-card">
                             <h3>Page Popularity</h3>
-                            <div class="page-stats" id="page-stats"></div>
+                            <div class="page-stats" id="page-stats">
+                                <!-- Page popularity stats will be inserted here -->
+                            </div>
                         </div>
                     </div>
                 </section>
-            </main>
-        </div>
+            </div>
+        </main>
 
-        <!-- Footer -->
         <footer class="admin-footer">
-            <p>&copy; 2025 Portfolio Admin Dashboard</p>
+            <p>&copy; 2025 Portfolio Admin Dashboard. All rights reserved.</p>
         </footer>
     </div>
 
+    <!-- JavaScript Files -->
+    <script src="js/animations.js"></script>
     <script src="js/admin.js"></script>
 </body>
 </html>
