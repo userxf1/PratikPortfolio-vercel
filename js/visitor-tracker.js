@@ -130,31 +130,29 @@ document.addEventListener('DOMContentLoaded', function() {
     /**
      * Update the visitor count in UI
      */
-    function updateVisitorCount() {
-        // Fetch count from API
-        fetch(`${API_BASE_URL}/visitors/count`)
-            .then(response => response.json())
-            .then(data => {
-                if (visitorCountElement) {
-                    visitorCountElement.textContent = data.count;
-                    
-                    // Add animation effect to the count
-                    visitorCountElement.classList.add('pulse');
-                    setTimeout(() => {
-                        visitorCountElement.classList.remove('pulse');
-                    }, 1000);
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching visitor count:', error);
-                
-                // Fallback to localStorage if API fails
-                const visitors = JSON.parse(localStorage.getItem('portfolio_visitors')) || [];
-                if (visitorCountElement) {
-                    visitorCountElement.textContent = visitors.length;
-                }
-            });
-    }
+   // In js/visitor-tracker.js, modify updateVisitorCount:
+function updateVisitorCount() {
+    fetch(`${API_BASE_URL}/visitors/count`)
+        .then(response => response.json())
+        .then(data => {
+            if (visitorCountElement) {
+                visitorCountElement.textContent = data.count;
+                visitorCountElement.classList.add('pulse');
+                setTimeout(() => {
+                    visitorCountElement.classList.remove('pulse');
+                }, 1000);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching visitor count:', error);
+            const visitors = JSON.parse(localStorage.getItem('portfolio_visitors')) || [];
+            if (visitorCountElement) {
+                visitorCountElement.textContent = visitors.length;
+                visitorCountElement.style.color = 'orange'; // Indicate fallback
+                visitorCountElement.title = 'Using local data due to server issue';
+            }
+        });
+}
     
     /**
      * Start a session timer to record visit duration
