@@ -1,290 +1,136 @@
-/*---------------------------------------------
- * Visitor Tracking JavaScript
- * Records site visitors and page views to Neon Database
- *--------------------------------------------*/
-
 document.addEventListener('DOMContentLoaded', function() {
     'use strict';
-    
-    // DOM elements
+
+    const API_BASE_URL = '/api';
     const visitorCountElement = document.getElementById('visitor-count');
-    
-    // API endpoint (using current domain and port 3000 for the API)
-   const API_BASE_URL = '/api';
-    
-    // Initialize tracking
-    initVisitorTracking();
-    
-    /**
-     * Initialize visitor tracking
-     */
-    function initVisitorTracking() {
-        // Generate or retrieve visitor ID
-        const visitorId = getVisitorId();
-        
-        // Record this visit
-        recordVisit(visitorId);
-        
-        // Update visitor count in the UI
-        updateVisitorCount();
-        
-        // Start session timer
-        startSessionTimer(visitorId);
-        
-        // Record page view
-        recordPageView(visitorId);
-    }
-    
-    /**
-     * Generate or retrieve a unique visitor ID
-     */
-    function getVisitorId() {
-        // Check if visitor already has an ID in localStorage
-        let visitorId = localStorage.getItem('portfolio_visitor_id');
-        
-        // If no ID exists, generate a new one
-        if (!visitorId) {
-            visitorId = generateUUID();
-            localStorage.setItem('portfolio_visitor_id', visitorId);
-        }
-        
-        return visitorId;
-    }
-    
-    /**
-     * Generate a UUID v4 (random)
-     */
+
+    // Generate or retrieve visitor ID
     function generateUUID() {
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-            const r = Math.random() * 16 | 0;
-            const v = c === 'x' ? r : (r & 0x3 | 0x8);
-            return v.toString(16);
-        });
+        return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+            (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+        );
     }
-    
-    /**
-     * Record a visitor to Neon database and localStorage
-     */
-    function recordVisit(visitorId) {
-        // Get browser and device info
-        const browserInfo = detectBrowser();
-        const deviceInfo = detectDevice();
-        const screenSize = window.innerWidth + 'x' + window.innerHeight;
-        const timestamp = new Date().getTime();
-        
-        // Save to localStorage for backup and local tracking
-        saveVisitorToLocalStorage(visitorId, timestamp, browserInfo, deviceInfo, screenSize);
-        
-        // Send to API
+
+    let visitorId = localStorage.getItem('visitorId');
+    if (!visitorId) {
+        visitorId = generateUUID();
+        localStorage.setItem('visitorId', visitorId);
+    }
+
+    // Get browser info
+    function getBrowserInfo() {
+        const ua = navigator.userAgent;
+        let browser = 'Unknown';
+        if (ua.includes('Chrome')) browser = 'Chrome';
+        else if (ua.includes('Firefox')) browser = 'Firefox';
+        else if (ua.includes('Safari')) browser = 'Safari';
+        else if (ua.includes('Edge')) browser = 'Edge';
+        else if (ua.includes('Opera')) browser = 'Opera';
+        return browser;
+    }
+
+    // Get device info
+    function getDeviceInfo() {
+        const ua = navigator.userAgent;
+        if (/mobile/i.test(ua)) return 'Mobile';
+        if (/tablet/i.test(ua)) return 'Tablet';
+        return 'Desktop';
+    }
+
+    // Record page view
+    function recordPageView() {
+        const timestamp = Date.now();
+        const page = window.location.pathname;
+        const browser = getBrowserInfo();
+        const device = getDeviceInfo();
+        const screenSize = `${window.screen.width}x${window.screen.height}`;
+
+        // Update visitor info
         fetch(`${API_BASE_URL}/visitors`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 id: visitorId,
-                timestamp: timestamp,
-                browser: browserInfo,
-                device: deviceInfo,
-                screenSize: screenSize
+                timestamp,
+                browser,
+                device,
+                screenSize
             })
         })
         .catch(error => {
-            console.error('Error recording visitor to database:', error);
-        });
-    }
-    
-    /**
-     * Save visitor data to localStorage as backup
-     */
-    function saveVisitorToLocalStorage(visitorId, timestamp, browserInfo, deviceInfo, screenSize) {
-        // Get existing visitors array from localStorage
-        const visitors = JSON.parse(localStorage.getItem('portfolio_visitors')) || [];
-        
-        // Check if this visitor is already recorded
-        const existingVisitor = visitors.find(visitor => visitor.id === visitorId);
-        
-        // If visitor exists, update last visit
-        if (existingVisitor) {
-            existingVisitor.timestamp = timestamp;
-            existingVisitor.visits++;
-            existingVisitor.browser = browserInfo;
-            existingVisitor.device = deviceInfo;
-            existingVisitor.screenSize = screenSize;
-        } else {
-            // Otherwise add a new visitor
-            visitors.push({
-                id: visitorId,
-                timestamp: timestamp,
-                visits: 1,
-                browser: browserInfo,
-                device: deviceInfo,
-                screenSize: screenSize
-            });
-        }
-        
-        // Save back to localStorage
-        localStorage.setItem('portfolio_visitors', JSON.stringify(visitors));
-    }
-    
-    /**
-     * Update the visitor count in UI
-     */
-   // In js/visitor-tracker.js, modify updateVisitorCount:
-function updateVisitorCount() {
-    fetch(`${API_BASE_URL}/visitors/count`)
-        .then(response => response.json())
-        .then(data => {
-            if (visitorCountElement) {
-                visitorCountElement.textContent = data.count;
-                visitorCountElement.classList.add('pulse');
-                setTimeout(() => {
-                    visitorCountElement.classList.remove('pulse');
-                }, 1000);
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching visitor count:', error);
+            console.error('Error recording visitor:', error);
+            // Fallback to localStorage
             const visitors = JSON.parse(localStorage.getItem('portfolio_visitors')) || [];
-            if (visitorCountElement) {
-                visitorCountElement.textContent = visitors.length;
-                visitorCountElement.style.color = 'orange'; // Indicate fallback
-                visitorCountElement.title = 'Using local data due to server issue';
+            const existingVisitor = visitors.find(v => v.id === visitorId);
+            if (existingVisitor) {
+                existingVisitor.visits += 1;
+                existingVisitor.timestamp = timestamp;
+                existingVisitor.browser = browser;
+                existingVisitor.device = device;
+                existingVisitor.screenSize = screenSize;
+            } else {
+                visitors.push({ id: visitorId, timestamp, visits: 1, browser, device, screenSize });
             }
+            localStorage.setItem('portfolio_visitors', JSON.stringify(visitors));
         });
-}
-    
-    /**
-     * Start a session timer to record visit duration
-     */
-    function startSessionTimer(visitorId) {
-        // Record session start time
-        const sessionStart = new Date().getTime();
-        localStorage.setItem('portfolio_session_start', sessionStart);
-        
-        // Set up event listener for when user leaves the page
-        window.addEventListener('beforeunload', function() {
-            // Calculate session duration
-            const sessionEnd = new Date().getTime();
-            const sessionDuration = Math.round((sessionEnd - sessionStart) / 1000); // in seconds
-            
-            // Only record if session was at least 5 seconds (avoid bounces)
-            if (sessionDuration >= 5) {
-                // Save to localStorage as backup
-                const sessionDurations = JSON.parse(localStorage.getItem('portfolio_sessionDurations')) || [];
-                sessionDurations.push(sessionDuration);
-                localStorage.setItem('portfolio_sessionDurations', JSON.stringify(sessionDurations));
-                
-                // Send to API (using navigator.sendBeacon for reliable sending during page unload)
-                const data = {
-                    visitorId: visitorId,
-                    duration: sessionDuration,
-                    timestamp: sessionEnd
-                };
-                
-                // Use sendBeacon if available, otherwise use fetch
-                if (navigator.sendBeacon) {
-                    navigator.sendBeacon(`${API_BASE_URL}/sessions`, JSON.stringify(data));
-                } else {
-                    fetch(`${API_BASE_URL}/sessions`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(data),
-                        keepalive: true
-                    });
-                }
-            }
-        });
-    }
-    
-    /**
-     * Record a page view
-     */
-    function recordPageView(visitorId) {
-        // Get current page
-        const currentPage = window.location.pathname || '/';
-        const timestamp = new Date().getTime();
-        
-        // Save to localStorage for backup
-        const pageViews = JSON.parse(localStorage.getItem('portfolio_pageviews')) || [];
-        pageViews.push({
-            visitorId: visitorId,
-            page: currentPage,
-            timestamp: timestamp
-        });
-        localStorage.setItem('portfolio_pageviews', JSON.stringify(pageViews));
-        
-        // Send to API
+
+        // Record page view
         fetch(`${API_BASE_URL}/pageviews`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                visitorId: visitorId,
-                page: currentPage,
-                timestamp: timestamp
-            })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ visitorId, page, timestamp })
         })
         .catch(error => {
-            console.error('Error recording page view to database:', error);
+            console.error('Error recording page view:', error);
+            const pageViews = JSON.parse(localStorage.getItem('portfolio_pageviews')) || [];
+            pageViews.push({ visitorId, page, timestamp });
+            localStorage.setItem('portfolio_pageviews', JSON.stringify(pageViews));
         });
     }
-    
-    /**
-     * Detect browser information
-     */
-    function detectBrowser() {
-        const userAgent = navigator.userAgent;
-        let browserName = "Unknown";
-        
-        if (userAgent.indexOf("Firefox") > -1) {
-            browserName = "Firefox";
-        } else if (userAgent.indexOf("Opera") > -1 || userAgent.indexOf("OPR") > -1) {
-            browserName = "Opera";
-        } else if (userAgent.indexOf("Trident") > -1) {
-            browserName = "Internet Explorer";
-        } else if (userAgent.indexOf("Edge") > -1) {
-            browserName = "Edge";
-        } else if (userAgent.indexOf("Chrome") > -1) {
-            browserName = "Chrome";
-        } else if (userAgent.indexOf("Safari") > -1) {
-            browserName = "Safari";
-        }
-        
-        return browserName;
+
+    // Update visitor count in UI
+    function updateVisitorCount() {
+        fetch(`${API_BASE_URL}/visitors/count`)
+            .then(response => response.json())
+            .then(data => {
+                if (visitorCountElement) {
+                    visitorCountElement.textContent = data.count;
+                    visitorCountElement.classList.add('pulse');
+                    setTimeout(() => visitorCountElement.classList.remove('pulse'), 1000);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching visitor count:', error);
+                const pageViews = JSON.parse(localStorage.getItem('portfolio_pageviews')) || [];
+                if (visitorCountElement) {
+                    visitorCountElement.textContent = pageViews.length;
+                    visitorCountElement.style.color = 'orange';
+                    visitorCountElement.title = 'Using local data due to server issue';
+                }
+            });
     }
-    
-    /**
-     * Detect device type
-     */
-    function detectDevice() {
-        const userAgent = navigator.userAgent;
-        
-        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent)) {
-            if (/iPad|tablet|Tablet/i.test(userAgent)) {
-                return "Tablet";
-            }
-            return "Mobile";
-        }
-        
-        return "Desktop";
+
+    // Record session duration
+    function recordSessionDuration() {
+        const startTime = Date.now();
+        window.addEventListener('beforeunload', () => {
+            const duration = Math.round((Date.now() - startTime) / 1000); // Duration in seconds
+            fetch(`${API_BASE_URL}/sessions`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ visitorId, duration, timestamp: Date.now() })
+            })
+            .catch(error => {
+                console.error('Error recording session duration:', error);
+                const sessionDurations = JSON.parse(localStorage.getItem('portfolio_sessionDurations')) || [];
+                sessionDurations.push({ visitorId, duration, timestamp: Date.now() });
+                localStorage.setItem('portfolio_sessionDurations', JSON.stringify(sessionDurations));
+            });
+        });
     }
-    
-    // Add CSS animation
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
-        }
-        
-        .pulse {
-            animation: pulse 1s ease-in-out;
-        }
-    `;
-    document.head.appendChild(style);
+
+    // Initialize tracking
+    recordPageView();
+    updateVisitorCount();
+    recordSessionDuration();
 });
