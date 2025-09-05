@@ -1715,6 +1715,20 @@ section {
     transform: translateX(5px);
 }
 
+.form-message { padding: 15px; 
+               border-radius: 4px; 
+               margin-top: 10px; 
+}
+.form-message.success { 
+    background-color: rgba(40, 167, 69, 0.1); 
+    border-left: 4px solid #28a745; 
+}
+
+.form-message.error { 
+    background-color: rgba(220, 53, 69, 0.1); 
+    border-left: 4px solid #dc3545; 
+}
+                    
 /* ---- Footer ---- */
 .footer {
     background-color: var(--bg-color-light);
