@@ -11,6 +11,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const pageStatsElement = document.getElementById('page-stats');
     const navItems = document.querySelectorAll('.admin-nav li');
     const adminPanels = document.querySelectorAll('.admin-panel');
+    const sidebarToggle = document.querySelector('.sidebar-toggle');
+    const sidebar = document.querySelector('.admin-sidebar');
     
     // API endpoint
     const API_BASE_URL = '/api';
@@ -23,15 +25,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Set up navigation
     navItems.forEach(item => {
-        item.addEventListener('click', function(e) {
-            e.preventDefault();
-            const targetId = this.querySelector('a').getAttribute('href').substring(1);
-            
-            // Update active nav item
+        item.addEventListener('click', function() {
             navItems.forEach(navItem => navItem.classList.remove('active'));
             this.classList.add('active');
-            
-            // Show corresponding panel
+            const targetId = this.querySelector('a').getAttribute('href').substring(1);
             adminPanels.forEach(panel => {
                 panel.classList.remove('active');
                 if (panel.id === targetId) {
@@ -40,6 +37,13 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     });
+    
+    // Mobile sidebar toggle
+    if (sidebarToggle && sidebar) {
+        sidebarToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('active');
+        });
+    }
     
     /**
      * Update all statistics on the dashboard
@@ -361,7 +365,7 @@ document.addEventListener('DOMContentLoaded', function() {
     /**
      * Clean up old data
      */
-    function cleanupOldData() {
+    window.cleanupOldData = function() {
         fetch(`${API_BASE_URL}/admin/cleanup`, { method: 'POST' })
             .then(res => res.json())
             .then(data => {
@@ -376,5 +380,5 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error('Error cleaning up data:', error);
                 alert('Error cleaning up data');
             });
-    }
+    };
 });
