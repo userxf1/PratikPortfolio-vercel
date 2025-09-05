@@ -4,8 +4,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // DOM elements
     const totalVisitorsElement = document.getElementById('total-visitors');
     const totalPageViewsElement = document.getElementById('total-page-views');
-    const avgSessionTimeElement = document.getElementById('avg-session-time');
     const mobileUsersElement = document.getElementById('mobile-users');
+    const pcUsersElement = document.getElementById('pc-users');
     const visitorsTableBody = document.getElementById('visitors-table-body');
     const browserStatsElement = document.getElementById('browser-stats');
     const pageStatsElement = document.getElementById('page-stats');
@@ -48,28 +48,28 @@ document.addEventListener('DOMContentLoaded', function() {
         // Show loading state
         if (totalVisitorsElement) totalVisitorsElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
         if (totalPageViewsElement) totalPageViewsElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-        if (avgSessionTimeElement) totalPageViewsElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-        if (mobileUsersElement) totalPageViewsElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        if (mobileUsersElement) mobileUsersElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        if (pcUsersElement) pcUsersElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
         // Fetch all stats concurrently
         Promise.all([
             fetch(`${API_BASE_URL}/admin/total-visitors`).then(res => res.json()),
             fetch(`${API_BASE_URL}/admin/total-page-views`).then(res => res.json()),
-            fetch(`${API_BASE_URL}/admin/avg-session-duration`).then(res => res.json()),
             fetch(`${API_BASE_URL}/admin/mobile-users`).then(res => res.json()),
+            fetch(`${API_BASE_URL}/admin/pc-users`).then(res => res.json()),
             fetch(`${API_BASE_URL}/admin/recent-visitors`).then(res => res.json()),
             fetch(`${API_BASE_URL}/admin/browser-stats`).then(res => res.json()),
             fetch(`${API_BASE_URL}/admin/page-stats`).then(res => res.json()),
             fetch(`${API_BASE_URL}/admin/device-stats`).then(res => res.json()),
             fetch(`${API_BASE_URL}/admin/session-buckets`).then(res => res.json())
         ])
-            .then(([totalVisitors, totalPageViews, avgSession, mobileUsers, recentVisitors, browserStats, pageStats, deviceStats, sessionBuckets]) => {
+            .then(([totalVisitors, totalPageViews, mobileUsers, pcUsers, recentVisitors, browserStats, pageStats, deviceStats, sessionBuckets]) => {
                 // Update UI with the data
                 updateDashboardWithData(
                     totalVisitors.count,
                     totalPageViews.count,
-                    avgSession.avg_duration,
                     mobileUsers.percentage,
+                    pcUsers.percentage,
                     recentVisitors,
                     browserStats,
                     pageStats,
@@ -86,8 +86,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 updateDashboardWithData(
                     visitors.length,
                     pageViews.length,
-                    sessionDurations.length > 0 ? sessionDurations.reduce((sum, d) => sum + d, 0) / sessionDurations.length : 0,
                     visitors.length > 0 ? Math.round((visitors.filter(v => v.device === 'Mobile').length / visitors.length) * 100) : 0,
+                    visitors.length > 0 ? Math.round((visitors.filter(v => v.device === 'Desktop').length / visitors.length) * 100) : 0,
                     visitors,
                     computeBrowserStats(visitors),
                     computePageStats(pageViews),
@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', function() {
     /**
      * Update dashboard with the provided data
      */
-    function updateDashboardWithData(totalVisitors, totalPageViews, avgSessionDuration, mobilePercentage, visitors, browserStats, pageStats, deviceStats, sessionBuckets) {
+    function updateDashboardWithData(totalVisitors, totalPageViews, mobilePercentage, pcPercentage, visitors, browserStats, pageStats, deviceStats, sessionBuckets) {
         // Update summary stats with pulse animation
         if (totalVisitorsElement) {
             totalVisitorsElement.textContent = totalVisitors;
@@ -114,16 +114,16 @@ document.addEventListener('DOMContentLoaded', function() {
             setTimeout(() => totalPageViewsElement.closest('.stats-card').classList.remove('pulse'), 1000);
         }
         
-        if (avgSessionTimeElement) {
-            avgSessionTimeElement.textContent = formatTime(Math.round(avgSessionDuration));
-            avgSessionTimeElement.closest('.stats-card').classList.add('pulse');
-            setTimeout(() => avgSessionTimeElement.closest('.stats-card').classList.remove('pulse'), 1000);
-        }
-        
         if (mobileUsersElement) {
             mobileUsersElement.textContent = `${mobilePercentage}%`;
             mobileUsersElement.closest('.stats-card').classList.add('pulse');
             setTimeout(() => mobileUsersElement.closest('.stats-card').classList.remove('pulse'), 1000);
+        }
+        
+        if (pcUsersElement) {
+            pcUsersElement.textContent = `${pcPercentage}%`;
+            pcUsersElement.closest('.stats-card').classList.add('pulse');
+            setTimeout(() => pcUsersElement.closest('.stats-card').classList.remove('pulse'), 1000);
         }
 
         // Populate visitors table
@@ -149,23 +149,6 @@ document.addEventListener('DOMContentLoaded', function() {
             minute: '2-digit'
         };
         return date.toLocaleDateString('en-US', options);
-    }
-    
-    /**
-     * Format time in seconds to a readable string
-     */
-    function formatTime(seconds) {
-        if (seconds < 60) {
-            return `${seconds}s`;
-        } else if (seconds < 3600) {
-            const minutes = Math.floor(seconds / 60);
-            const remainingSeconds = seconds % 60;
-            return `${minutes}m ${remainingSeconds}s`;
-        } else {
-            const hours = Math.floor(seconds / 3600);
-            const minutes = Math.floor((seconds % 3600) / 60);
-            return `${hours}h ${minutes}m`;
-        }
     }
     
     /**
@@ -366,10 +349,10 @@ document.addEventListener('DOMContentLoaded', function() {
             '> 10 min': 0
         };
         sessionDurations.forEach(duration => {
-            if (duration < 60) buckets['< 1 min']++;
-            else if (duration < 180) buckets['1-3 min']++;
-            else if (duration < 300) buckets['3-5 min']++;
-            else if (duration < 600) buckets['5-10 min']++;
+            if (duration.duration < 60) buckets['< 1 min']++;
+            else if (duration.duration < 180) buckets['1-3 min']++;
+            else if (duration.duration < 300) buckets['3-5 min']++;
+            else if (duration.duration < 600) buckets['5-10 min']++;
             else buckets['> 10 min']++;
         });
         return Object.entries(buckets).map(([bucket, count]) => ({ bucket, count }));
