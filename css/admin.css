@@ -455,26 +455,53 @@ canvas {
     transition: width 0.5s ease;
 }
 
+/* Contact Logs Table */
 .contact-logs-table {
     width: 100%;
     border-collapse: collapse;
-    background: var(--background-dark);
+    background: var(--bg-color-lighter);
+    font-size: 1.5rem;
 }
-.contact-logs-table th, .contact-logs-table td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid var(--border-color);
-}
+
 .contact-logs-table th {
-    background: var(--primary-dark);
-    color: #fff;
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 15px;
+    text-align: left;
+    font-size: 1.6rem;
+    color: var(--primary-color);
+    font-weight: 600;
 }
+
 .contact-logs-table td {
-    color: #ccc;
+    padding: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    color: var(--text-color);
 }
-.contact-logs-table tr:hover {
-    background: rgba(157, 78, 221, 0.1);
+
+.contact-logs-table tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.03);
 }
+
+.contact-logs-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* New styles for Subject (4th column) and Message (5th column) */
+.contact-logs-table td:nth-child(4), /* Subject */
+.contact-logs-table td:nth-child(5) { /* Message */
+    max-width: 200px; /* Limit width to prevent overflow */
+    overflow-wrap: break-word; /* Wrap long words */
+    white-space: normal; /* Allow multi-line text */
+    height: auto; /* Auto-adjust height */
+    text-overflow: ellipsis; /* Show ellipsis for truncated text */
+    padding: 15px 16px; /* Consistent padding with slight increase for readability */
+}
+
+/* Ensure table layout remains stable */
+.contact-logs-table {
+    table-layout: auto; /* Allow columns to adjust based on content */
+}
+
 /* Footer */
 .admin-footer {
     background-color: var(--bg-color-lighter);
