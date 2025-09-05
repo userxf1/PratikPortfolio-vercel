@@ -799,6 +799,13 @@ section {
     text-shadow: 2px 2px 4px rgba(157, 78, 221, 0.3);
 }
 
+.visitor-counter {
+    font-size: 1.2rem;
+    color: var(--text-color);
+    margin-top: 20px;
+    text-align: center;
+}
+
 /* ---- Hero Section ---- */
 .hero {
     min-height: 100vh;
