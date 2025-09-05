@@ -1,21 +1,24 @@
 {
-  "name": "workspace",
+  "name": "portfolio",
   "version": "1.0.0",
-  "main": "index.js",
+  "description": "Portfolio with visitor tracking and admin dashboard",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js",
+    "dev": "nodemon server.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
+    "express": "^4.17.1",
+    "pg": "^8.7.3",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.7",
-    "express": "^4.21.2",
-    "pg": "^8.14.1"
-  }
-}
-"scripts": {
-  "start": "node server.js"
+    "dotenv": "^10.0.0",
+    "path": "^0.12.7",
+    "express-rate-limit": "^6.7.0",
+    "express-basic-auth": "^1.2.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  },
+  "author": "Your Name",
+  "license": "ISC"
 }
