@@ -205,6 +205,7 @@ html {
 
 .admin-panel {
     display: none;
+    padding-top: 0px;
     scroll-margin-top: 130px;
 }
 
