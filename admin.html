@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
-    <meta name="description" content="Admin dashboard for visitor tracking and analytics">
+    <meta name="description" content="Admin dashboard for visitor tracking, analytics, and contact form submissions">
     <!-- Favicon -->
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
     <!-- Font Awesome CDN -->
@@ -56,6 +56,7 @@
                         <li class="active"><a href="#dashboard"><i class="fas fa-chart-line"></i> Dashboard</a></li>
                         <li><a href="#visitors"><i class="fas fa-users"></i> Visitors</a></li>
                         <li><a href="#stats"><i class="fas fa-chart-bar"></i> Statistics</a></li>
+                        <li><a href="#contact-logs"><i class="fas fa-envelope"></i> Contact Logs</a></li>
                     </ul>
                 </nav>
             </div>
@@ -65,7 +66,6 @@
                 <section id="dashboard" class="admin-panel active">
                     <h2 class="panel-title">Dashboard</h2>
                     <div class="dashboard-controls">
-                        <button class="cleanup-btn" onclick="cleanupOldData()">Cleanup Old Data</button>
                     </div>
                     <div class="stats-cards">
                         <div class="stats-card">
@@ -149,6 +149,28 @@
                                 <!-- Page popularity stats will be inserted here -->
                             </div>
                         </div>
+                    </div>
+                </section>
+
+                <!-- Contact Logs Panel -->
+                <section id="contact-logs" class="admin-panel">
+                    <h2 class="panel-title">Contact Logs</h2>
+                    <div class="table-container">
+                        <table class="contact-logs-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Subject</th>
+                                    <th>Message</th>
+                                    <th>Date / Time</th>
+                                </tr>
+                            </thead>
+                            <tbody id="contact-logs-table-body">
+                                <!-- Contact submissions will be dynamically inserted here -->
+                            </tbody>
+                        </table>
                     </div>
                 </section>
             </div>
