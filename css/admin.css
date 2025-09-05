@@ -241,7 +241,7 @@ html {
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 25px;
     margin-bottom: 40px;
-    width: max-content;
+    width: 700px;
 }
 
 .stats-card {
