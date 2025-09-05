@@ -18,6 +18,11 @@ app.use('/api/', rateLimit({
     max: 100 // 100 requests per IP
 }));
 
+// Route to serve admin.html for /admin
+app.get('/admin', (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin.html'));
+});
+
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: { rejectUnauthorized: false }
