@@ -1,4 +1,3 @@
-// server.js
 const express = require('express');
 const { Pool } = require('pg');
 const cors = require('cors');
@@ -15,13 +14,11 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
-// Rate limiting for API routes
 app.use('/api/', rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 100 // 100 requests per IP
 }));
 
-// Basic auth for admin routes
 app.use('/api/admin/*', basicAuth({
     users: { 'admin': process.env.AUTH_PASSWORD || 'default-password' },
     challenge: true
@@ -71,17 +68,17 @@ async function initializeDatabase() {
         console.log('Database initialized successfully');
     } catch (error) {
         console.error('Error initializing database:', error);
-        throw error; // Prevent server start if DB init fails
+        throw error;
     }
 }
 
 // API Routes
 app.get('/api/visitors/count', async (req, res) => {
     try {
-        const result = await pool.query('SELECT COUNT(*) AS count FROM visitors');
+        const result = await pool.query('SELECT COUNT(*) AS count FROM page_views');
         res.json({ count: parseInt(result.rows[0].count) });
     } catch (error) {
-        console.error('Error getting visitor count:', error);
+        console.error('Error getting page view count:', error);
         res.status(500).json({ error: 'Server error' });
     }
 });
@@ -135,7 +132,7 @@ app.post('/api/sessions', async (req, res) => {
     }
 });
 
-// Admin Routes (from previous response)
+// Admin Routes (unchanged from previous response)
 app.get('/api/admin/total-visitors', async (req, res) => {
     try {
         const result = await pool.query('SELECT COUNT(*) AS count FROM visitors');
@@ -290,12 +287,11 @@ app.post('/api/admin/cleanup', async (req, res) => {
     }
 });
 
-// Start server only after DB initialization
 initializeDatabase().then(() => {
     app.listen(PORT, () => {
         console.log(`Server running on port ${PORT}`);
     });
 }).catch(err => {
     console.error('Failed to initialize database:', err);
-    process.exit(1); // Exit if DB initialization fails
+    process.exit(1);
 });
