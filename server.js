@@ -4,7 +4,6 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
 const rateLimit = require('express-rate-limit');
-const basicAuth = require('express-basic-auth');
 
 dotenv.config();
 const app = express();
@@ -17,11 +16,6 @@ app.use(express.static(path.join(__dirname)));
 app.use('/api/', rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 100 // 100 requests per IP
-}));
-
-app.use('/api/admin/*', basicAuth({
-    users: { 'admin': process.env.AUTH_PASSWORD || 'default-password' },
-    challenge: true
 }));
 
 const pool = new Pool({
@@ -132,7 +126,7 @@ app.post('/api/sessions', async (req, res) => {
     }
 });
 
-// Admin Routes (unchanged from previous response)
+// Admin Routes
 app.get('/api/admin/total-visitors', async (req, res) => {
     try {
         const result = await pool.query('SELECT COUNT(*) AS count FROM visitors');
@@ -153,16 +147,6 @@ app.get('/api/admin/total-page-views', async (req, res) => {
     }
 });
 
-app.get('/api/admin/avg-session-duration', async (req, res) => {
-    try {
-        const result = await pool.query('SELECT AVG(duration) AS avg_duration FROM session_durations');
-        res.json({ avg_duration: parseFloat(result.rows[0].avg_duration) || 0 });
-    } catch (error) {
-        console.error('Error fetching average session duration:', error);
-        res.status(500).json({ error: 'Server error' });
-    }
-});
-
 app.get('/api/admin/mobile-users', async (req, res) => {
     try {
         const result = await pool.query(`
@@ -172,6 +156,19 @@ app.get('/api/admin/mobile-users', async (req, res) => {
         res.json({ percentage: parseFloat(result.rows[0].percentage) || 0 });
     } catch (error) {
         console.error('Error fetching mobile users:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+app.get('/api/admin/pc-users', async (req, res) => {
+    try {
+        const result = await pool.query(`
+            SELECT
+                (SELECT COUNT(*) FROM visitors WHERE device = 'Desktop') * 100.0 / NULLIF((SELECT COUNT(*) FROM visitors), 0) AS percentage
+        `);
+        res.json({ percentage: parseFloat(result.rows[0].percentage) || 0 });
+    } catch (error) {
+        console.error('Error fetching PC users:', error);
         res.status(500).json({ error: 'Server error' });
     }
 });
