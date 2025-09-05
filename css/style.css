@@ -484,34 +484,6 @@ section {
     transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* Visitor Counter */
-.theme-toggle {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background-color: var(--bg-color-lighter);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: var(--text-color);
-    font-size: 1.6rem;
-    cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    transform-style: preserve-3d;
-    perspective: 1000px;
-    margin-right: 20px;
-}
-
-.theme-toggle:hover {
-    background-color: var(--primary-color);
-    color: white;
-    transform: rotateY(15deg) rotateX(15deg) translateZ(5px);
-    box-shadow: 
-        -5px -5px 15px rgba(255, 255, 255, 0.05),
-        5px 5px 15px rgba(0, 0, 0, 0.3),
-        0 8px 20px rgba(157, 78, 221, 0.3);
-}
 
 #header.sticky {
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
