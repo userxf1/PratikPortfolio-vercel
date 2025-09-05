@@ -35,6 +35,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const filterBtns = document.querySelectorAll('.filter-btn');
     const projectCards = document.querySelectorAll('.project-card');
     const contactForm = document.getElementById('contact-form');
+    const formMessage = document.getElementById('form-message');
     
     // Initialize custom cursor
     initCustomCursor();
@@ -129,16 +130,20 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Form submission handling
-    if (contactForm) {
-        contactForm.addEventListener('submit', function(e) {
+    if (contactForm && formMessage) {
+        contactForm.addEventListener('submit', async function(e) {
             e.preventDefault();
+            
+            // Clear previous messages
+            formMessage.textContent = '';
+            formMessage.className = 'form-message';
             
             // Get form data
             const formData = {
-                name: document.getElementById('name').value,
-                email: document.getElementById('email').value,
-                subject: document.getElementById('subject').value,
-                message: document.getElementById('message').value
+                name: document.getElementById('name').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                subject: document.getElementById('subject').value.trim(),
+                message: document.getElementById('message').value.trim()
             };
             
             // Validate form data
@@ -146,12 +151,36 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
-            // Show submit success message
-            // In a real application, this would submit to a server
-            showFormMessage('success', 'Your message has been sent successfully!');
+            // Show loading state
+            const submitBtn = contactForm.querySelector('.submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
             
-            // Reset form
-            contactForm.reset();
+            try {
+                const response = await fetch('/api/contact', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    formMessage.textContent = 'Your message has been sent successfully!';
+                    formMessage.className = 'form-message success';
+                    contactForm.reset();
+                } else {
+                    formMessage.textContent = result.message || 'Failed to send message. Please try again.';
+                    formMessage.className = 'form-message error';
+                }
+            } catch (error) {
+                console.error('Error submitting form:', error);
+                formMessage.textContent = 'An error occurred. Please try again later.';
+                formMessage.className = 'form-message error';
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<span>Send Message</span><i class="fas fa-paper-plane"></i>';
+            }
         });
     }
     
@@ -215,97 +244,40 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Form validation function
     function validateForm(data) {
-        // Reset previous error messages
-        const errorElements = document.querySelectorAll('.error-message');
-        errorElements.forEach(el => el.remove());
-        
-        let isValid = true;
+        // Clear previous error messages
+        formMessage.textContent = '';
+        formMessage.className = 'form-message';
         
         // Validate name (at least 2 characters)
-        if (data.name.trim().length < 2) {
-            showInputError('name', 'Name must be at least 2 characters');
-            isValid = false;
+        if (data.name.length < 2) {
+            formMessage.textContent = 'Name must be at least 2 characters';
+            formMessage.className = 'form-message error';
+            return false;
         }
         
         // Validate email
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(data.email)) {
-            showInputError('email', 'Please enter a valid email address');
-            isValid = false;
+            formMessage.textContent = 'Please enter a valid email address';
+            formMessage.className = 'form-message error';
+            return false;
         }
         
         // Validate subject (at least 3 characters)
-        if (data.subject.trim().length < 3) {
-            showInputError('subject', 'Subject must be at least 3 characters');
-            isValid = false;
+        if (data.subject.length < 3) {
+            formMessage.textContent = 'Subject must be at least 3 characters';
+            formMessage.className = 'form-message error';
+            return false;
         }
         
         // Validate message (at least 10 characters)
-        if (data.message.trim().length < 10) {
-            showInputError('message', 'Message must be at least 10 characters');
-            isValid = false;
+        if (data.message.length < 10) {
+            formMessage.textContent = 'Message must be at least 10 characters';
+            formMessage.className = 'form-message error';
+            return false;
         }
         
-        return isValid;
-    }
-    
-    // Show input error
-    function showInputError(inputId, message) {
-        const input = document.getElementById(inputId);
-        const errorMessage = document.createElement('span');
-        errorMessage.className = 'error-message';
-        errorMessage.textContent = message;
-        errorMessage.style.color = 'var(--error-color)';
-        errorMessage.style.fontSize = '1.3rem';
-        errorMessage.style.marginTop = '5px';
-        errorMessage.style.display = 'block';
-        
-        input.parentNode.appendChild(errorMessage);
-        input.style.boxShadow = '0 0 0 2px var(--error-color)';
-        
-        // Remove error on input focus
-        input.addEventListener('focus', function() {
-            input.style.boxShadow = '';
-            if (errorMessage.parentNode) {
-                errorMessage.parentNode.removeChild(errorMessage);
-            }
-        });
-    }
-    
-    // Show form message
-    function showFormMessage(type, message) {
-        // Create message element
-        const messageElement = document.createElement('div');
-        messageElement.className = `form-message ${type}`;
-        messageElement.textContent = message;
-        
-        // Style based on type
-        if (type === 'success') {
-            messageElement.style.backgroundColor = 'rgba(40, 167, 69, 0.1)';
-            messageElement.style.borderLeft = '4px solid var(--success-color)';
-        } else {
-            messageElement.style.backgroundColor = 'rgba(220, 53, 69, 0.1)';
-            messageElement.style.borderLeft = '4px solid var(--error-color)';
-        }
-        
-        messageElement.style.padding = '15px';
-        messageElement.style.marginTop = '20px';
-        messageElement.style.borderRadius = '4px';
-        
-        // Add to the form
-        contactForm.appendChild(messageElement);
-        
-        // Remove after 5 seconds
-        setTimeout(() => {
-            messageElement.style.opacity = '0';
-            setTimeout(() => {
-                if (messageElement.parentNode) {
-                    messageElement.parentNode.removeChild(messageElement);
-                }
-            }, 300);
-        }, 5000);
-        
-        messageElement.style.transition = 'opacity 0.3s ease';
+        return true;
     }
     
     // Initialize custom cursor
@@ -398,8 +370,8 @@ document.addEventListener('DOMContentLoaded', function() {
             'what is this': 'This is a professional portfolio website showcasing my work, skills, and experience as a frontend developer.',
             'what do you do': 'I\'m here to help visitors navigate this portfolio and answer questions about my skills, projects, and experience.',
             
-            'contact': 'You can get in touch through the contact form in the Contact section, or directly via email at john.doe@example.com.',
-            'email': 'You can reach me at john.doe@example.com',
+            'contact': 'You can get in touch through the contact form in the Contact section, or directly via email at ashishkumarsinghhhh@gmail.com.',
+            'email': 'You can reach me at ashishkumarsinghhhh@gmail.com',
             'phone': 'For contact information, please check the Contact section or send me an email.',
             
             'projects': 'I have worked on various web development projects. You can check them out in the Projects section of this portfolio.',
@@ -410,8 +382,8 @@ document.addEventListener('DOMContentLoaded', function() {
             'technologies': 'I work with HTML5, CSS3, JavaScript, React, Sass, Bootstrap, Git, and various other web technologies.',
             'tech stack': 'My tech stack primarily includes HTML5, CSS3, JavaScript, and modern frameworks/libraries like React.',
             
-            'experience': 'I have 3+ years of experience in frontend development, working on various projects for different clients and industries.',
-            'background': 'I have a background in web development with 3+ years of experience, specializing in creating responsive and interactive websites.',
+            'experience': 'I have 2+ years of experience in frontend development, working on various projects for different clients and industries.',
+            'background': 'I have a background in web development with 2+ years of experience, specializing in creating responsive and interactive websites.',
             
             'resume': 'You can download my resume using the "Download Resume" button in the Home section.',
             'cv': 'My CV is available for download in the Home section. Just click on the "Download Resume" button.',
