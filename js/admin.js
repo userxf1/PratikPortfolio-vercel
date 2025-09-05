@@ -269,3 +269,21 @@ function updatePageStats(pageStats) {
         pageStatsElement.appendChild(statItem);
     });
 }
+
+                          // In js/admin.js, add to the bottom:
+function cleanupOldData() {
+    fetch(`${API_BASE_URL}/admin/cleanup`, { method: 'POST' })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                alert('Old data cleaned up successfully');
+                updateStats(); // Refresh stats after cleanup
+            } else {
+                alert('Failed to clean up data');
+            }
+        })
+        .catch(error => {
+            console.error('Error cleaning up data:', error);
+            alert('Error cleaning up data');
+        });
+}
