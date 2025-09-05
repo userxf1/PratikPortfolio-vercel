@@ -105,7 +105,7 @@ html {
     box-shadow: 5px 0 15px rgba(0, 0, 0, 0.05);
     border-right: 1px solid rgba(255, 255, 255, 0.1);
     position: fixed;
-    top: 130px;
+    top: 70px;
     left: 0;
     width: 250px;
     height: calc(100vh - 130px);
@@ -305,6 +305,7 @@ html {
     border-radius: var(--border-radius-md);
     padding: 25px;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    width: 500px;
 }
 
 .chart-box h3 {
@@ -326,6 +327,7 @@ canvas {
     padding: 25px;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
     overflow-x: auto;
+    width: 700px;
 }
 
 .visitors-table {
@@ -364,6 +366,7 @@ canvas {
     padding: 25px;
     margin-bottom: 30px;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    width: 700px;
 }
 
 .stats-overview h3 {
@@ -381,6 +384,7 @@ canvas {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 30px;
+    width: 900px;
 }
 
 .detail-card {
