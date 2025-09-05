@@ -772,8 +772,33 @@ section {
 }
 
 /* ---- Visitor Counter ---- */
-.visitor-count {
-color: #9D4EDD;
+.visitor-counter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Arial', sans-serif;
+    font-size: 1.6rem;
+    color: #ffffff; 
+    background-color: #1a1a1a; 
+    padding: 10px 15px;
+    border-radius: 5px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease; 
+}
+
+.visitor-counter i {
+    color: #9D4EDD; 
+    font-size: 1.8rem;
+}
+
+#visitor-count {
+    color: #9D4EDD; 
+    font-weight: 600;
+}
+
+.visitor-counter:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
 
