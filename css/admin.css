@@ -13,10 +13,6 @@
     --transition-medium: all 0.3s ease;
 }
 
-html {
-    scroll-behavior: smooth;
-}
-
 .admin-container {
     display: flex;
     flex-direction: column;
@@ -36,9 +32,6 @@ html {
     align-items: center;
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
     border-bottom: 1px solid var(--bg-color-lighter);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
 }
 
 .admin-logo a {
@@ -87,11 +80,6 @@ html {
     padding: 30px 0;
     box-shadow: 5px 0 15px rgba(0, 0, 0, 0.05);
     border-right: 1px solid rgba(255, 255, 255, 0.1);
-    position: sticky;
-    top: 130px;
-    height: calc(100vh - 130px);
-    overflow-y: auto;
-    z-index: 900;
 }
 
 .admin-profile {
@@ -145,7 +133,6 @@ html {
     text-decoration: none;
     transition: var(--transition-medium);
     position: relative;
-    cursor: pointer;
 }
 
 .admin-nav a i {
@@ -154,10 +141,8 @@ html {
 }
 
 .admin-nav li.active a {
-    background-color: rgba(157, 78, 221, 0.3);
+    background-color: rgba(157, 78, 221, 0.2);
     color: var(--primary-color);
-    font-weight: 600;
-    border-radius: 5px;
 }
 
 .admin-nav li.active a::before {
@@ -171,9 +156,8 @@ html {
 }
 
 .admin-nav a:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.05);
     color: var(--primary-color);
-    transform: translateX(5px);
 }
 
 /* Admin Content */
@@ -469,9 +453,7 @@ canvas {
     }
     
     .admin-sidebar {
-        position: static;
-        height: auto;
-        display: block;
+        display: none;
     }
     
     .stats-details {
