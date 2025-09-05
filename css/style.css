@@ -771,6 +771,12 @@ section {
     text-shadow: 2px 2px 4px rgba(157, 78, 221, 0.3);
 }
 
+/* ---- Visitor Counter ---- */
+.visitor-count{
+color: --primary-color;
+}
+
+
 /* ---- Hero Section ---- */
 .hero {
     min-height: 100vh;
