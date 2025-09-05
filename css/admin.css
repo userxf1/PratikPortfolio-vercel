@@ -455,6 +455,26 @@ canvas {
     transition: width 0.5s ease;
 }
 
+.contact-logs-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--background-dark);
+}
+.contact-logs-table th, .contact-logs-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+.contact-logs-table th {
+    background: var(--primary-dark);
+    color: #fff;
+}
+.contact-logs-table td {
+    color: #ccc;
+}
+.contact-logs-table tr:hover {
+    background: rgba(157, 78, 221, 0.1);
+}
 /* Footer */
 .admin-footer {
     background-color: var(--bg-color-lighter);
