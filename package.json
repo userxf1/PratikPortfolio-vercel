@@ -13,12 +13,14 @@
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
     "path": "^0.12.7",
-    "express-rate-limit": "^6.7.0",
-    "express-basic-auth": "^1.2.1"
+    "express-rate-limit": "^6.7.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.15"
   },
   "author": "Your Name",
-  "license": "ISC"
+  "license": "ISC",
+  "engines": {
+    "node": ">=14.x"
+  }
 }
