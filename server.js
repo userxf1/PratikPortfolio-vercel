@@ -4,6 +4,8 @@ const { Pool } = require('pg');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
+const rateLimit = require('express-rate-limit');
+const basicAuth = require('express-basic-auth');
 
 dotenv.config();
 const app = express();
@@ -12,6 +14,18 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
+
+// Rate limiting for API routes
+app.use('/api/', rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100 // 100 requests per IP
+}));
+
+// Basic auth for admin routes
+app.use('/api/admin/*', basicAuth({
+    users: { 'admin': process.env.AUTH_PASSWORD || 'default-password' },
+    challenge: true
+}));
 
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
@@ -57,6 +71,7 @@ async function initializeDatabase() {
         console.log('Database initialized successfully');
     } catch (error) {
         console.error('Error initializing database:', error);
+        throw error; // Prevent server start if DB init fails
     }
 }
 
@@ -120,6 +135,7 @@ app.post('/api/sessions', async (req, res) => {
     }
 });
 
+// Admin Routes (from previous response)
 app.get('/api/admin/total-visitors', async (req, res) => {
     try {
         const result = await pool.query('SELECT COUNT(*) AS count FROM visitors');
@@ -274,10 +290,12 @@ app.post('/api/admin/cleanup', async (req, res) => {
     }
 });
 
+// Start server only after DB initialization
 initializeDatabase().then(() => {
     app.listen(PORT, () => {
         console.log(`Server running on port ${PORT}`);
     });
 }).catch(err => {
     console.error('Failed to initialize database:', err);
+    process.exit(1); // Exit if DB initialization fails
 });
