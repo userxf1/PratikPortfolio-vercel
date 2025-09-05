@@ -4,6 +4,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
 const rateLimit = require('express-rate-limit');
+const { v4: uuidv4 } = require('uuid');
 
 dotenv.config();
 const app = express();
@@ -17,11 +18,6 @@ app.use('/api/', rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 100 // 100 requests per IP
 }));
-
-// Route to serve admin.html for /admin
-app.get('/admin', (req, res) => {
-    res.sendFile(path.join(__dirname, 'admin.html'));
-});
 
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
@@ -63,6 +59,18 @@ async function initializeDatabase() {
         `);
         await pool.query(`CREATE INDEX IF NOT EXISTS idx_session_durations_visitor_id ON session_durations (visitor_id)`);
         await pool.query(`CREATE INDEX IF NOT EXISTS idx_session_durations_timestamp ON session_durations (timestamp)`);
+        
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS contact_submissions (
+                id UUID PRIMARY KEY,
+                name VARCHAR(100) NOT NULL,
+                email VARCHAR(255) NOT NULL,
+                subject VARCHAR(255) NOT NULL,
+                message TEXT NOT NULL,
+                timestamp BIGINT NOT NULL
+            );
+        `);
+        await pool.query(`CREATE INDEX IF NOT EXISTS idx_contact_submissions_timestamp ON contact_submissions (timestamp)`);
         
         console.log('Database initialized successfully');
     } catch (error) {
@@ -128,6 +136,27 @@ app.post('/api/sessions', async (req, res) => {
     } catch (error) {
         console.error('Error recording session duration:', error);
         res.status(500).json({ error: 'Server error' });
+    }
+});
+
+app.post('/api/contact', async (req, res) => {
+    const { name, email, subject, message } = req.body;
+    const id = uuidv4();
+    const timestamp = Date.now();
+    
+    if (!name || !email || !subject || !message) {
+        return res.status(400).json({ message: 'All fields are required' });
+    }
+    
+    try {
+        await pool.query(
+            'INSERT INTO contact_submissions (id, name, email, subject, message, timestamp) VALUES ($1, $2, $3, $4, $5, $6)',
+            [id, name, email, subject, message, timestamp]
+        );
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error storing contact submission:', error);
+        res.status(500).json({ message: 'Failed to store contact submission' });
     }
 });
 
@@ -268,6 +297,27 @@ app.get('/api/admin/session-buckets', async (req, res) => {
     }
 });
 
+app.get('/api/admin/contact-logs', async (req, res) => {
+    try {
+        const result = await pool.query(`
+            SELECT id, name, email, subject, message, timestamp
+            FROM contact_submissions
+            ORDER BY timestamp DESC
+        `);
+        res.json(result.rows.map(row => ({
+            id: row.id,
+            name: row.name,
+            email: row.email,
+            subject: row.subject,
+            message: row.message,
+            timestamp: parseInt(row.timestamp)
+        })));
+    } catch (error) {
+        console.error('Error fetching contact logs:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
 app.post('/api/admin/cleanup', async (req, res) => {
     try {
         await pool.query(`
@@ -280,6 +330,10 @@ app.post('/api/admin/cleanup', async (req, res) => {
         `);
         await pool.query(`
             DELETE FROM visitors
+            WHERE timestamp < EXTRACT(EPOCH FROM NOW() - INTERVAL '30 days') * 1000
+        `);
+        await pool.query(`
+            DELETE FROM contact_submissions
             WHERE timestamp < EXTRACT(EPOCH FROM NOW() - INTERVAL '30 days') * 1000
         `);
         res.json({ success: true });
