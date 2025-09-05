@@ -13,6 +13,23 @@
     z-index: 1;
 }
 
+.dashboard-controls {
+    margin: 20px 0;
+    text-align: right;
+}
+.cleanup-btn {
+    padding: 10px 20px;
+    background-color: #9D4EDD;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+.cleanup-btn:hover {
+    background-color: #5A189A;
+}
+
 /* Header */
 .admin-header {
     background-color: rgba(10, 10, 10, 0.97);
@@ -381,6 +398,7 @@ canvas {
     border-top: 1px solid rgba(255, 255, 255, 0.05);
     text-align: center;
 }
+
 
 .admin-footer p {
     font-size: 1.4rem;
