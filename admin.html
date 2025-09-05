@@ -30,10 +30,14 @@
                     <span>Portfolio Admin</span>
                 </a>
             </div>
-            <a href="index.html" class="back-to-site">
-                <i class="fas fa-arrow-left"></i>
-                Back to Site
-            </a>
+            <div class="header-controls">
+                <button class="sidebar-toggle" aria-label="Toggle Sidebar">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <a href="index.html" class="back-to-site">
+                    <i class="fas fa-arrow-left"></i> Back to Site
+                </a>
+            </div>
         </header>
 
         <main class="admin-main">
@@ -60,37 +64,39 @@
                 <!-- Dashboard Panel -->
                 <section id="dashboard" class="admin-panel active">
                     <h2 class="panel-title">Dashboard</h2>
-                    <!-- In admin.html, inside <section id="dashboard" class="admin-panel active"> -->
-<div class="stats-cards">
-    <div class="stats-card">
-        <div class="stats-icon"><i class="fas fa-users"></i></div>
-        <div class="stats-info">
-            <h3>Total Visitors</h3>
-            <p id="total-visitors"><i class="fas fa-spinner fa-spin"></i></p>
-        </div>
-    </div>
-    <div class="stats-card">
-        <div class="stats-icon"><i class="fas fa-eye"></i></div>
-        <div class="stats-info">
-            <h3>Total Page Views</h3>
-            <p id="total-page-views"><i class="fas fa-spinner fa-spin"></i></p>
-        </div>
-    </div>
-    <div class="stats-card">
-        <div class="stats-icon"><i class="fas fa-mobile-alt"></i></div>
-        <div class="stats-info">
-            <h3>Mobile Users</h3>
-            <p id="mobile-users"><i class="fas fa-spinner fa-spin"></i></p>
-        </div>
-    </div>
-    <div class="stats-card">
-        <div class="stats-icon"><i class="fas fa-desktop"></i></div>
-        <div class="stats-info">
-            <h3>PC Users</h3>
-            <p id="pc-users"><i class="fas fa-spinner fa-spin"></i></p>
-        </div>
-    </div>
-</div>
+                    <div class="dashboard-controls">
+                        <button class="cleanup-btn" onclick="cleanupOldData()">Cleanup Old Data</button>
+                    </div>
+                    <div class="stats-cards">
+                        <div class="stats-card">
+                            <div class="stats-icon"><i class="fas fa-users"></i></div>
+                            <div class="stats-info">
+                                <h3>Total Visitors</h3>
+                                <p id="total-visitors"><i class="fas fa-spinner fa-spin"></i></p>
+                            </div>
+                        </div>
+                        <div class="stats-card">
+                            <div class="stats-icon"><i class="fas fa-eye"></i></div>
+                            <div class="stats-info">
+                                <h3>Total Page Views</h3>
+                                <p id="total-page-views"><i class="fas fa-spinner fa-spin"></i></p>
+                            </div>
+                        </div>
+                        <div class="stats-card">
+                            <div class="stats-icon"><i class="fas fa-mobile-alt"></i></div>
+                            <div class="stats-info">
+                                <h3>Mobile Users</h3>
+                                <p id="mobile-users"><i class="fas fa-spinner fa-spin"></i></p>
+                            </div>
+                        </div>
+                        <div class="stats-card">
+                            <div class="stats-icon"><i class="fas fa-desktop"></i></div>
+                            <div class="stats-info">
+                                <h3>PC Users</h3>
+                                <p id="pc-users"><i class="fas fa-spinner fa-spin"></i></p>
+                            </div>
+                        </div>
+                    </div>
                     <div class="charts-container">
                         <div class="chart-box">
                             <h3>Devices</h3>
