@@ -799,11 +799,30 @@ section {
     text-shadow: 2px 2px 4px rgba(157, 78, 221, 0.3);
 }
 
+/* In css/style.css */
 .visitor-counter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1rem;
+    color: var(--text-color, #ffffff);
+    padding: 8px 12px;
+    border-radius: 5px;
+    transition: color 0.3s;
+}
+
+.visitor-counter i {
     font-size: 1.2rem;
-    color: var(--text-color);
-    margin-top: 20px;
-    text-align: center;
+}
+
+.visitor-counter.pulse {
+    animation: pulse 0.5s ease-in-out;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
 }
 
 /* ---- Hero Section ---- */
