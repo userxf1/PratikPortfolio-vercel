@@ -29,16 +29,17 @@ const pool = new Pool({
 async function initializeDatabase() {
     try {
         // Create visitors table
-        await pool.query(`
-            CREATE TABLE IF NOT EXISTS visitors (
-                id VARCHAR(255) PRIMARY KEY,
-                timestamp BIGINT NOT NULL,
-                visits INTEGER DEFAULT 1,
-                browser VARCHAR(100),
-                device VARCHAR(100),
-                screen_size VARCHAR(100)
-            );
-        `);
+        // In server.js, modify the CREATE TABLE query:
+await pool.query(`
+    CREATE TABLE IF NOT EXISTS visitors (
+        id UUID PRIMARY KEY,
+        timestamp BIGINT NOT NULL,
+        visits INTEGER DEFAULT 1,
+        browser VARCHAR(100),
+        device VARCHAR(100),
+        screen_size VARCHAR(100)
+    );
+`);
         
         // Create page_views table
         await pool.query(`
