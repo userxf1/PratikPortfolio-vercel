@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const visitorCountElement = document.getElementById('visitor-count');
     
     // API endpoint (using current domain and port 3000 for the API)
-    const API_BASE_URL = 'http://' + window.location.hostname + ':3000/api';
+   const API_BASE_URL = '/api';
     
     // Initialize tracking
     initVisitorTracking();
