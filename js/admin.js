@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const mobileUsersElement = document.getElementById('mobile-users');
     const pcUsersElement = document.getElementById('pc-users');
     const visitorsTableBody = document.getElementById('visitors-table-body');
+    const contactLogsTableBody = document.getElementById('contact-logs-table-body');
     const browserStatsElement = document.getElementById('browser-stats');
     const pageStatsElement = document.getElementById('page-stats');
     const navItems = document.querySelectorAll('.admin-nav li');
@@ -54,6 +55,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (totalPageViewsElement) totalPageViewsElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
         if (mobileUsersElement) mobileUsersElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
         if (pcUsersElement) pcUsersElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        if (contactLogsTableBody) contactLogsTableBody.innerHTML = '<tr><td colspan="6"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>';
 
         // Fetch all stats concurrently
         Promise.all([
@@ -65,9 +67,10 @@ document.addEventListener('DOMContentLoaded', function() {
             fetch(`${API_BASE_URL}/admin/browser-stats`).then(res => res.json()),
             fetch(`${API_BASE_URL}/admin/page-stats`).then(res => res.json()),
             fetch(`${API_BASE_URL}/admin/device-stats`).then(res => res.json()),
-            fetch(`${API_BASE_URL}/admin/session-buckets`).then(res => res.json())
+            fetch(`${API_BASE_URL}/admin/session-buckets`).then(res => res.json()),
+            fetch(`${API_BASE_URL}/admin/contact-logs`).then(res => res.json())
         ])
-            .then(([totalVisitors, totalPageViews, mobileUsers, pcUsers, recentVisitors, browserStats, pageStats, deviceStats, sessionBuckets]) => {
+            .then(([totalVisitors, totalPageViews, mobileUsers, pcUsers, recentVisitors, browserStats, pageStats, deviceStats, sessionBuckets, contactLogs]) => {
                 // Update UI with the data
                 updateDashboardWithData(
                     totalVisitors.count,
@@ -78,7 +81,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     browserStats,
                     pageStats,
                     deviceStats,
-                    sessionBuckets
+                    sessionBuckets,
+                    contactLogs
                 );
             })
             .catch(error => {
@@ -87,6 +91,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const visitors = JSON.parse(localStorage.getItem('portfolio_visitors')) || [];
                 const pageViews = JSON.parse(localStorage.getItem('portfolio_pageviews')) || [];
                 const sessionDurations = JSON.parse(localStorage.getItem('portfolio_sessionDurations')) || [];
+                const contactLogs = JSON.parse(localStorage.getItem('portfolio_contact_logs')) || [];
                 updateDashboardWithData(
                     visitors.length,
                     pageViews.length,
@@ -96,7 +101,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     computeBrowserStats(visitors),
                     computePageStats(pageViews),
                     computeDeviceStats(visitors),
-                    computeSessionBuckets(sessionDurations)
+                    computeSessionBuckets(sessionDurations),
+                    contactLogs
                 );
             });
     }
@@ -104,7 +110,7 @@ document.addEventListener('DOMContentLoaded', function() {
     /**
      * Update dashboard with the provided data
      */
-    function updateDashboardWithData(totalVisitors, totalPageViews, mobilePercentage, pcPercentage, visitors, browserStats, pageStats, deviceStats, sessionBuckets) {
+    function updateDashboardWithData(totalVisitors, totalPageViews, mobilePercentage, pcPercentage, visitors, browserStats, pageStats, deviceStats, sessionBuckets, contactLogs) {
         // Update summary stats with pulse animation
         if (totalVisitorsElement) {
             totalVisitorsElement.textContent = totalVisitors;
@@ -130,8 +136,9 @@ document.addEventListener('DOMContentLoaded', function() {
             setTimeout(() => pcUsersElement.closest('.stats-card').classList.remove('pulse'), 1000);
         }
 
-        // Populate visitors table
+        // Populate tables
         populateVisitorsTable(visitors);
+        populateContactLogsTable(contactLogs);
         
         // Update browser and page stats
         updateBrowserStats(browserStats);
@@ -264,6 +271,58 @@ document.addEventListener('DOMContentLoaded', function() {
             row.appendChild(screenCell);
             
             visitorsTableBody.appendChild(row);
+        });
+    }
+    
+    /**
+     * Populate the contact logs table with data
+     */
+    function populateContactLogsTable(contactLogs) {
+        contactLogsTableBody.innerHTML = '';
+        
+        const sortedLogs = [...contactLogs].sort((a, b) => b.timestamp - a.timestamp);
+        
+        if (sortedLogs.length === 0) {
+            const row = document.createElement('tr');
+            const cell = document.createElement('td');
+            cell.colSpan = 6;
+            cell.textContent = 'No contact submissions available';
+            cell.style.textAlign = 'center';
+            row.appendChild(cell);
+            contactLogsTableBody.appendChild(row);
+            return;
+        }
+        
+        sortedLogs.forEach(log => {
+            const row = document.createElement('tr');
+            
+            const idCell = document.createElement('td');
+            idCell.textContent = log.id.substring(0, 8) + '...';
+            
+            const nameCell = document.createElement('td');
+            nameCell.textContent = log.name || 'Unknown';
+            
+            const emailCell = document.createElement('td');
+            emailCell.textContent = log.email || 'Unknown';
+            
+            const subjectCell = document.createElement('td');
+            subjectCell.textContent = log.subject || 'Unknown';
+            
+            const messageCell = document.createElement('td');
+            messageCell.textContent = log.message.length > 50 ? log.message.substring(0, 50) + '...' : log.message;
+            messageCell.title = log.message; // Full message on hover
+            
+            const dateCell = document.createElement('td');
+            dateCell.textContent = formatDate(new Date(log.timestamp));
+            
+            row.appendChild(idCell);
+            row.appendChild(nameCell);
+            row.appendChild(emailCell);
+            row.appendChild(subjectCell);
+            row.appendChild(messageCell);
+            row.appendChild(dateCell);
+            
+            contactLogsTableBody.appendChild(row);
         });
     }
     
