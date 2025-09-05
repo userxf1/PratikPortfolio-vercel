@@ -21,24 +21,46 @@ document.addEventListener('DOMContentLoaded', function() {
     // Set up auto-refresh every 30 seconds
     setInterval(updateStats, 30000);
     
-    // Set up navigation
+    // Handle navigation
+    function showPanel(targetId) {
+        // Update active nav item
+        navItems.forEach(navItem => navItem.classList.remove('active'));
+        const activeNav = Array.from(navItems).find(item => 
+            item.querySelector('a').getAttribute('href') === `#${targetId}`);
+        if (activeNav) activeNav.classList.add('active');
+        
+        // Show corresponding panel
+        adminPanels.forEach(panel => {
+            panel.classList.remove('active');
+            if (panel.id === targetId) {
+                panel.classList.add('active');
+            }
+        });
+    }
+    
+    // Set up navigation click handlers
     navItems.forEach(item => {
         item.addEventListener('click', function(e) {
             e.preventDefault();
             const targetId = this.querySelector('a').getAttribute('href').substring(1);
-            
-            // Update active nav item
-            navItems.forEach(navItem => navItem.classList.remove('active'));
-            this.classList.add('active');
-            
-            // Show corresponding panel
-            adminPanels.forEach(panel => {
-                panel.classList.remove('active');
-                if (panel.id === targetId) {
-                    panel.classList.add('active');
-                }
-            });
+            showPanel(targetId);
+            // Update URL hash without reloading
+            window.history.pushState(null, null, `#${targetId}`);
         });
+    });
+    
+    // Handle initial page load based on URL hash
+    const initialHash = window.location.hash.substring(1);
+    if (initialHash && document.getElementById(initialHash)) {
+        showPanel(initialHash);
+    } else {
+        showPanel('dashboard'); // Default to dashboard
+    }
+    
+    // Handle browser back/forward navigation
+    window.addEventListener('popstate', function() {
+        const hash = window.location.hash.substring(1) || 'dashboard';
+        showPanel(hash);
     });
     
     /**
@@ -227,6 +249,7 @@ document.addEventListener('DOMContentLoaded', function() {
      * Populate the visitors table with data
      */
     function populateVisitorsTable(visitors) {
+        if (!visitorsTableBody) return;
         visitorsTableBody.innerHTML = '';
         
         const sortedVisitors = [...visitors].sort((a, b) => b.timestamp - a.timestamp);
@@ -267,6 +290,7 @@ document.addEventListener('DOMContentLoaded', function() {
      * Update browser distribution stats
      */
     function updateBrowserStats(browserStats) {
+        if (!browserStatsElement) return;
         browserStatsElement.innerHTML = '';
         const total = browserStats.reduce((sum, stat) => sum + stat.count, 0);
         browserStats.forEach(stat => {
@@ -293,6 +317,7 @@ document.addEventListener('DOMContentLoaded', function() {
      * Update page popularity stats
      */
     function updatePageStats(pageStats) {
+        if (!pageStatsElement) return;
         pageStatsElement.innerHTML = '';
         const total = pageStats.reduce((sum, stat) => sum + stat.count, 0);
         pageStats.forEach(stat => {
@@ -361,7 +386,7 @@ document.addEventListener('DOMContentLoaded', function() {
     /**
      * Clean up old data
      */
-    function cleanupOldData() {
+    window.cleanupOldData = function() {
         fetch(`${API_BASE_URL}/admin/cleanup`, { method: 'POST' })
             .then(res => res.json())
             .then(data => {
@@ -376,5 +401,5 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error('Error cleaning up data:', error);
                 alert('Error cleaning up data');
             });
-    }
+    };
 });
