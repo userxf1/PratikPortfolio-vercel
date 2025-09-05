@@ -1,16 +1,56 @@
 /*---------------------------------------------
  * Admin Dashboard Styles
  *--------------------------------------------*/
-
 .admin-container {
-    width: 100%;
+    display: flex;
+    flex-direction: column;
     min-height: 100vh;
+}
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background-color: #121212;
+    color: white;
+}
+.admin-sidebar {
+    width: 250px;
+    background-color: #1a1a1a;
+    padding: 20px;
+}
+.admin-nav ul li.active {
+    background-color: #9D4EDD;
+}
+.admin-nav ul li a {
+    color: white;
+    display: block;
+    padding: 10px;
+}
+.stats-cards {
     display: grid;
-    grid-template-rows: auto 1fr auto;
-    max-width: 1600px;
-    margin: 0 auto;
-    position: relative;
-    z-index: 1;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+.stats-card {
+    background-color: #1a1a1a;
+    padding: 20px;
+    border-radius: 10px;
+    color: white;
+}
+.chart-box, .stat-chart-container {
+    background-color: #1a1a1a;
+    padding: 20px;
+    border-radius: 10px;
+}
+.visitors-table {
+    width: 100%;
+    border-collapse: collapse;
+    color: white;
+}
+.visitors-table th, .visitors-table td {
+    padding: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .dashboard-controls {
